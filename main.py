@@ -27,7 +27,9 @@ react_prompt_with_format_instructions = PromptTemplate(
 agent = create_react_agent(llm=llm, tools=tools, prompt=react_prompt_with_format_instructions)
 
 agent_excutor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
-chain = agent_excutor
+extract_output = RunnableLambda(lambda x: x["output"])
+extract_input = RunnableLambda(lambda x: output_parser.parse(x))
+chain = agent_excutor | extract_output | extract_input
 
 def main():
     result = chain.invoke(input={"input": "Search 3 jobs listing for ai engineer using langchian, works should be remote, and list tehire details",})
